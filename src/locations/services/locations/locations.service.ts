@@ -14,7 +14,7 @@ export class LocationsService {
     return this.locationRepository.find();
   }
 
-  findLocationsById(id: number) {
+  findLocationById(id: number) {
     return this.locationRepository.findOne({ where: { id } });
   }
 }

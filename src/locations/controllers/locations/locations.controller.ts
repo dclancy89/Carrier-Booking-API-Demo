@@ -13,6 +13,6 @@ export class LocationsController {
 
   @Get('id/:id')
   findLocationsById(@Param('id', ParseIntPipe) id: number) {
-    return this.locationsService.findLocationsById(id);
+    return this.locationsService.findLocationById(id);
   }
 }

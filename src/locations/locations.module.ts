@@ -9,5 +9,6 @@ import { Location } from 'src/models';
   imports: [TypeOrmModule.forFeature([Location])],
   controllers: [LocationsController],
   providers: [LocationsService],
+  exports: [LocationsService],
 })
 export class LocationsModule {}

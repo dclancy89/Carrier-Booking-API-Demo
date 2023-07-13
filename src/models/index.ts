@@ -1,7 +1,8 @@
+import { Appointment } from './Appointment.entity';
 import { DGEUser } from './DGEUser.entity';
 import { Location } from './Location.entity';
 
-const entities = [DGEUser, Location];
+const entities = [Appointment, DGEUser, Location];
 
-export { DGEUser, Location };
+export { Appointment, DGEUser, Location };
 export default entities;

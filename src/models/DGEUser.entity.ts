@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { UserType } from 'src/types';
+import { Location } from './Location.entity';
 
 @Entity()
 export class DGEUser {
@@ -9,5 +11,8 @@ export class DGEUser {
   name: string;
 
   @Column()
-  type: string;
+  type: UserType;
+
+  @OneToMany(() => Location, (location) => location.user_id)
+  locations: Location[];
 }

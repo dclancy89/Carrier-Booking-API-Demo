@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
+import { DGEUser } from './DGEUser.entity';
 @Entity()
 export class Location {
   @PrimaryGeneratedColumn()
@@ -22,4 +23,7 @@ export class Location {
 
   @Column('decimal', { precision: 10, scale: 7 })
   longitude: number;
+
+  @ManyToOne(() => DGEUser, (user) => user.id)
+  user: DGEUser;
 }
