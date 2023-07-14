@@ -14,6 +14,10 @@ export class LocationsService {
     return this.locationRepository.find();
   }
 
+  getLocationsByUserId(id: number) {
+    return this.locationRepository.find({ where: { user_id: id } });
+  }
+
   findLocationById(id: number) {
     return this.locationRepository.findOne({ where: { id } });
   }

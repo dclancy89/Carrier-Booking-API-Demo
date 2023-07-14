@@ -1,5 +1,12 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  ParseIntPipe,
+  Query,
+} from '@nestjs/common';
 
 import { AppointmentsService } from 'src/appointments/services/appointments/appointments.service';
 
@@ -15,6 +22,19 @@ export class AppointmentsController {
     return this.appointmentsService.getBookableCarriers(
       locationId,
       appointmentDate,
+    );
+  }
+
+  @Post('book')
+  bookAppointment(
+    @Body() pickupLocationId: number,
+    @Body() carrierId: number,
+    @Body() appointmentDateTime: Date,
+  ) {
+    return this.appointmentsService.createAppointment(
+      pickupLocationId,
+      carrierId,
+      appointmentDateTime,
     );
   }
 }

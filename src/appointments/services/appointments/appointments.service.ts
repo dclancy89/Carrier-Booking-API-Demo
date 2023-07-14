@@ -7,7 +7,14 @@ import { ConfigService } from '@nestjs/config';
 import { LocationsService } from 'src/locations/services/locations/locations.service';
 import { UsersService } from 'src/users/services/users/users.service';
 
+import { CreateAppointmentDto } from 'src/appointments/dto/CreateAppointment.dto';
+
+import { AppointmentStatus } from 'src/types';
+
 import { getDriveTime } from 'src/appointments/utils/getDriveTime';
+
+// We give the carrier a 30 minute grace window on top of travel time
+const bookingGraceTime = 30 * 60;
 
 @Injectable()
 export class AppointmentsService {
@@ -55,7 +62,7 @@ export class AppointmentsService {
         const now = new Date();
         const diff =
           (new Date(appointmentDateTime).getTime() - now.getTime()) / 1000;
-        return diff > location.travelTime;
+        return diff > location.travelTime + bookingGraceTime;
       });
     });
 
@@ -64,5 +71,46 @@ export class AppointmentsService {
       appointmentDate: appointmentDateTime,
       carriers: bookableCarriers,
     };
+  }
+
+  async createAppointment(
+    pickupLocationId: number,
+    carrierId: number,
+    appointmentDateTime: Date,
+  ) {
+    const pickupLocation = await this.locationsService.findLocationById(
+      pickupLocationId,
+    );
+    const carrierLocations = await this.locationsService.getLocationsByUserId(
+      carrierId,
+    );
+    const mapboxToken = this.configService.get('MAPBOX_TOKEN');
+
+    const driveTimes = await Promise.all(
+      carrierLocations.map(async (location) => {
+        return await getDriveTime(pickupLocation, location, mapboxToken);
+      }),
+    );
+
+    const isBookable = !!driveTimes.filter((time) => {
+      const now = new Date();
+      const diff =
+        (new Date(appointmentDateTime).getTime() - now.getTime()) / 1000;
+      return diff > time + bookingGraceTime;
+    }).length;
+
+    if (!isBookable) {
+      return 'Error';
+    }
+
+    const appointmentDto = new CreateAppointmentDto();
+    appointmentDto.appointment_date = new Date(appointmentDateTime);
+    appointmentDto.appointment_time = new Date(appointmentDateTime);
+    appointmentDto.customer_id = pickupLocation.user_id;
+    appointmentDto.carrier_id = carrierId;
+    appointmentDto.appointment_status = AppointmentStatus.PENDING;
+
+    const appointment = this.appointmentRepository.create(appointmentDto);
+    return this.appointmentRepository.save(appointment);
   }
 }
