@@ -5,6 +5,9 @@ import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 
 import { LocationsService } from 'src/locations/services/locations/locations.service';
+import { UsersService } from 'src/users/services/users/users.service';
+
+import { getDriveTime } from 'src/appointments/utils/getDriveTime';
 
 @Injectable()
 export class AppointmentsService {
@@ -13,6 +16,7 @@ export class AppointmentsService {
     private readonly appointmentRepository: Repository<Appointment>,
     private readonly locationsService: LocationsService,
     private readonly configService: ConfigService,
+    private readonly usersService: UsersService,
   ) {}
 
   async getBookableCarriers(
@@ -20,14 +24,45 @@ export class AppointmentsService {
     appointmentDateTime: Date,
   ) {
     const mapboxToken = this.configService.get('MAPBOX_TOKEN');
-    const directionsApiBaseUrl =
-      'https://api.mapbox.com/directions/v5/mapbox/driving-traffic/';
     const pickupLocation = await this.locationsService.findLocationById(
       pickupLocationId,
     );
-    return { location: pickupLocation, appointmentDate: appointmentDateTime };
+    const carriersWithLocations = await this.usersService.getCarrierLocations();
+
+    const carriersWithTimes = await Promise.all(
+      carriersWithLocations.map(async (carrier) => {
+        const locations = await Promise.all(
+          carrier.locations.map(async (location) => {
+            const travelTime = await getDriveTime(
+              pickupLocation,
+              location,
+              mapboxToken,
+            );
+            return { ...location, travelTime };
+          }),
+        );
+        return {
+          id: carrier.id,
+          name: carrier.name,
+          type: carrier.type,
+          locations,
+        };
+      }),
+    );
+
+    const bookableCarriers = carriersWithTimes.filter((carrier) => {
+      return carrier.locations.filter((location) => {
+        const now = new Date();
+        const diff =
+          (new Date(appointmentDateTime).getTime() - now.getTime()) / 1000;
+        return diff > location.travelTime;
+      });
+    });
+
+    return {
+      location: pickupLocation,
+      appointmentDate: appointmentDateTime,
+      carriers: bookableCarriers,
+    };
   }
 }
-
-// https://api.mapbox.com/directions/v5/mapbox/driving-traffic/-88.0593495,42.1585546;-88.0476135,42.1418144?access_token=sk.eyJ1IjoiZGNsYW5jeTg5IiwiYSI6ImNsazFhN2JkeTA0NWszcXRpNmlzaTJjeTIifQ.QIX2W--FJfjFC_sKm1tT4w
-// pk.eyJ1IjoiZGNsYW5jeTg5IiwiYSI6ImNsazE4Y2JqaDAzd2czbm54b2U5ZDVmMnAifQ.bjJQXqxuWeUVuRR1d2-aaw

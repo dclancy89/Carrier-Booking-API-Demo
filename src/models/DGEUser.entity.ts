@@ -13,6 +13,6 @@ export class DGEUser {
   @Column()
   type: UserType;
 
-  @OneToMany(() => Location, (location) => location.user_id)
+  @OneToMany(() => Location, (location) => location.user)
   locations: Location[];
 }

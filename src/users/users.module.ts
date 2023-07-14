@@ -9,5 +9,6 @@ import { DGEUser } from 'src/models';
   imports: [TypeOrmModule.forFeature([DGEUser])],
   controllers: [UsersController],
   providers: [UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}
