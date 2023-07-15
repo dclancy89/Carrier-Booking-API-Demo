@@ -1,5 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { AppointmentStatus } from 'src/types';
+import { DGEUser } from './DGEUser.entity';
+import { Location } from './Location.entity';
 
 @Entity()
 export class Appointment {
@@ -23,4 +31,16 @@ export class Appointment {
 
   @Column()
   appointment_status: AppointmentStatus;
+
+  @OneToOne(() => DGEUser)
+  @JoinColumn({ name: 'id' })
+  customer: DGEUser;
+
+  @OneToOne(() => DGEUser)
+  @JoinColumn({ name: 'id' })
+  carrier: DGEUser;
+
+  @OneToOne(() => Location)
+  @JoinColumn({ name: 'id' })
+  pickup_location: Location;
 }
