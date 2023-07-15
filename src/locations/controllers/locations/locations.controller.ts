@@ -15,4 +15,9 @@ export class LocationsController {
   findLocationsById(@Param('id', ParseIntPipe) id: number) {
     return this.locationsService.findLocationById(id);
   }
+
+  @Get('user/:userId')
+  getLocationsByUserId(@Param('userId', ParseIntPipe) userId: number) {
+    return this.locationsService.getLocationsByUserId(userId);
+  }
 }

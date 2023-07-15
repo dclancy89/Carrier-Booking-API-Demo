@@ -26,6 +26,10 @@ export class AppointmentsService {
     private readonly usersService: UsersService,
   ) {}
 
+  getAppointmentsForCustomer(userId: number) {
+    return this.appointmentRepository.find({ where: { customer_id: userId } });
+  }
+
   async getBookableCarriers(
     pickupLocationId: number,
     appointmentDateTime: Date,
