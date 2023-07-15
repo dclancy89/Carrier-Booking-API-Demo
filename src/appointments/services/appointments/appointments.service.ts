@@ -82,12 +82,16 @@ export class AppointmentsService {
     carrierId: number,
     appointmentDateTime: Date,
   ) {
+    console.log(typeof pickupLocationId);
+    console.log('made it into createAppointment');
     const pickupLocation = await this.locationsService.findLocationById(
       pickupLocationId,
     );
+    console.log('got pickupLocation');
     const carrierLocations = await this.locationsService.getLocationsByUserId(
       carrierId,
     );
+    console.log('got carrierLocation');
     const mapboxToken = this.configService.get('MAPBOX_TOKEN');
 
     const driveTimes = await Promise.all(
@@ -106,6 +110,8 @@ export class AppointmentsService {
     if (!isBookable) {
       return 'Error';
     }
+
+    console.log('made it past the validation');
 
     const appointmentDto = new CreateAppointmentDto();
     appointmentDto.appointment_date = new Date(appointmentDateTime);

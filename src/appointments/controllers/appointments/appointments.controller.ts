@@ -32,9 +32,9 @@ export class AppointmentsController {
 
   @Post('book')
   bookAppointment(
-    @Body() pickupLocationId: number,
-    @Body() carrierId: number,
-    @Body() appointmentDateTime: Date,
+    @Body('pickupLocationId', ParseIntPipe) pickupLocationId: number,
+    @Body('carrierId', ParseIntPipe) carrierId: number,
+    @Body('appointmentDateTime') appointmentDateTime: Date,
   ) {
     return this.appointmentsService.createAppointment(
       pickupLocationId,
