@@ -9,6 +9,9 @@ export class CreateAppointmentDto {
   appointment_time: Date;
 
   @IsNotEmpty()
+  pickup_location_id: number;
+
+  @IsNotEmpty()
   customer_id: number;
 
   @IsNotEmpty()

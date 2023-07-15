@@ -13,6 +13,9 @@ export class Appointment {
   appointment_time: Date;
 
   @Column()
+  pickup_location_id: number;
+
+  @Column()
   customer_id: number;
 
   @Column()

@@ -14,7 +14,7 @@ import { AppointmentsService } from 'src/appointments/services/appointments/appo
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
-  @Get('user/:id')
+  @Get('customer/:id')
   getAppointmentsForCustomer(@Param('id', ParseIntPipe) id: number) {
     return this.appointmentsService.getAppointmentsForCustomer(id);
   }
