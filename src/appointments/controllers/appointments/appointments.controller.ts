@@ -19,6 +19,11 @@ export class AppointmentsController {
     return this.appointmentsService.getAppointmentsForCustomer(id);
   }
 
+  @Get('carrier/:id')
+  getAppointmentsForCarrier(@Param('id', ParseIntPipe) id: number) {
+    return this.appointmentsService.getAppointmentsForCarrier(id);
+  }
+
   @Get('bookable/:locationId')
   getBookableCarriers(
     @Param('locationId', ParseIntPipe) locationId: number,

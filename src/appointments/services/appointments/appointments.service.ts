@@ -37,6 +37,17 @@ export class AppointmentsService {
     });
   }
 
+  getAppointmentsForCarrier(userId: number) {
+    return this.appointmentRepository.find({
+      where: { carrier_id: userId },
+      relations: {
+        customer: true,
+        carrier: true,
+        pickup_location: true,
+      },
+    });
+  }
+
   async getBookableCarriers(
     pickupLocationId: number,
     appointmentDateTime: Date,

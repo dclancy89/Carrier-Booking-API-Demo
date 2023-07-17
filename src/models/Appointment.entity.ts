@@ -33,14 +33,14 @@ export class Appointment {
   appointment_status: AppointmentStatus;
 
   @OneToOne(() => DGEUser)
-  @JoinColumn({ name: 'id' })
+  @JoinColumn({ name: 'customer_id' })
   customer: DGEUser;
 
   @OneToOne(() => DGEUser)
-  @JoinColumn({ name: 'id' })
+  @JoinColumn({ name: 'carrier_id' })
   carrier: DGEUser;
 
   @OneToOne(() => Location)
-  @JoinColumn({ name: 'id' })
+  @JoinColumn({ name: 'pickup_location_id' })
   pickup_location: Location;
 }
