@@ -155,8 +155,6 @@ export class AppointmentsService {
     appointmentId: number,
     appointmentStatus: AppointmentStatus,
   ) {
-    console.log(Object.values(AppointmentStatus));
-    console.log(appointmentStatus);
     if (!Object.values(AppointmentStatus).includes(appointmentStatus)) {
       return 'Error: Not a valid appointment status';
     }
