@@ -26,6 +26,17 @@ export class AppointmentsService {
     private readonly usersService: UsersService,
   ) {}
 
+  getAppointmentById(appointmentId: number) {
+    return this.appointmentRepository.findOne({
+      where: { id: appointmentId },
+      relations: {
+        customer: true,
+        carrier: true,
+        pickup_location: true,
+      },
+    });
+  }
+
   getAppointmentsForCustomer(userId: number) {
     return this.appointmentRepository.find({
       where: { customer_id: userId },
@@ -136,6 +147,24 @@ export class AppointmentsService {
     appointmentDto.appointment_status = AppointmentStatus.PENDING;
 
     const appointment = this.appointmentRepository.create(appointmentDto);
-    return this.appointmentRepository.save(appointment);
+    const savedAppointment = await this.appointmentRepository.save(appointment);
+    return this.getAppointmentById(savedAppointment.id);
+  }
+
+  async updateAppointmentStatus(
+    appointmentId: number,
+    appointmentStatus: AppointmentStatus,
+  ) {
+    console.log(Object.values(AppointmentStatus));
+    console.log(appointmentStatus);
+    if (!Object.values(AppointmentStatus).includes(appointmentStatus)) {
+      return 'Error: Not a valid appointment status';
+    }
+    const appointment = await this.appointmentRepository.findOne({
+      where: { id: appointmentId },
+    });
+    appointment.appointment_status = appointmentStatus;
+    await this.appointmentRepository.save(appointment);
+    return await this.getAppointmentById(appointmentId);
   }
 }

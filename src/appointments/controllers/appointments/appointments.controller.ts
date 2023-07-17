@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 
 import { AppointmentsService } from 'src/appointments/services/appointments/appointments.service';
+import { AppointmentStatus } from 'src/types';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -45,6 +46,17 @@ export class AppointmentsController {
       pickupLocationId,
       carrierId,
       appointmentDateTime,
+    );
+  }
+
+  @Post('update_status')
+  updateAppointmentStatus(
+    @Body('appointmentId', ParseIntPipe) appointmentId: number,
+    @Body('appointmentStatus') appointmentStatus: AppointmentStatus,
+  ) {
+    return this.appointmentsService.updateAppointmentStatus(
+      appointmentId,
+      appointmentStatus,
     );
   }
 }
