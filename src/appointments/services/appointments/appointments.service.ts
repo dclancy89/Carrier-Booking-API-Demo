@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Appointment } from 'src/models';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 
 import { LocationsService } from 'src/locations/services/locations/locations.service';
@@ -50,7 +50,10 @@ export class AppointmentsService {
 
   getAppointmentsForCarrier(userId: number) {
     return this.appointmentRepository.find({
-      where: { carrier_id: userId },
+      where: {
+        carrier_id: userId,
+        appointment_status: Not(AppointmentStatus.DECLINED),
+      },
       relations: {
         customer: true,
         carrier: true,
@@ -59,6 +62,10 @@ export class AppointmentsService {
     });
   }
 
+  // This method checks which carriers have a location that
+  // is within driving time to the pick up location before the appointment date/time
+  // i.e. Does the carrier have a location where they can physically get to the pick up
+  // location before the requested date/time.
   async getBookableCarriers(
     pickupLocationId: number,
     appointmentDateTime: Date,
@@ -69,6 +76,7 @@ export class AppointmentsService {
     );
     const carriersWithLocations = await this.usersService.getCarrierLocations();
 
+    // Get the drive times from each carrier location to the pickup location
     const carriersWithTimes = await Promise.all(
       carriersWithLocations.map(async (carrier) => {
         const locations = await Promise.all(
@@ -90,6 +98,7 @@ export class AppointmentsService {
       }),
     );
 
+    // Check if the carrier has at least one location with a short enough drive time
     const bookableCarriers = carriersWithTimes.filter((carrier) => {
       return carrier.locations.filter((location) => {
         const now = new Date();
@@ -127,6 +136,7 @@ export class AppointmentsService {
       }),
     );
 
+    // Verify that the carrier is still able to fulfil the appointment window before creating appointment
     const isBookable = !!driveTimes.filter((time) => {
       const now = new Date();
       const diff =
